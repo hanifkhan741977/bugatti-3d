@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bugatti Luxury 3D Showroom</title>
+    <title>3D Luxury Car Showroom</title>
 
-    <!-- Three.js aur GLTFLoader CDNs -->
+    <!-- Three.js aur GLTFLoader CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/RGBELoader.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
         * {
@@ -37,8 +35,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1;
             cursor: grab;
+            z-index: 1;
         }
 
         #webgl-container:active {
@@ -51,75 +49,38 @@
             top: 0;
             left: 0;
             width: 100%;
-            padding: 20px 5%;
+            padding: 22px 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 10;
-            background: linear-gradient(180deg, rgba(3,4,6,0.85) 0%, transparent 100%);
             pointer-events: none;
+            background: linear-gradient(180deg, rgba(3,4,6,0.9) 0%, transparent 100%);
         }
 
-        .brand-logo {
-            pointer-events: auto;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .brand-logo h1 {
+        .brand-title {
             font-family: 'Cinzel', serif;
             font-size: 24px;
-            color: #d4af37;
             letter-spacing: 4px;
+            color: #d4af37;
             text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
         }
 
-        /* UI Overlays & Instructions */
-        .ui-overlay {
+        /* Hint Text */
+        .hint-text {
             position: absolute;
-            bottom: 30px;
-            left: 5%;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 10;
-            pointer-events: none;
-        }
-
-        .ui-overlay h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 38px;
-            letter-spacing: 2px;
-            color: #fff;
-        }
-
-        .ui-overlay h2 span {
+            font-size: 13px;
             color: #d4af37;
-            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
-        }
-
-        .car-specs {
-            color: #aaa;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .click-hint {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 15px;
-            padding: 8px 18px;
-            border-radius: 20px;
-            border: 1px solid rgba(212, 175, 55, 0.5);
-            background: rgba(212, 175, 55, 0.1);
-            color: #d4af37;
-            font-size: 12px;
             letter-spacing: 1px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
+            pointer-events: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            background: rgba(212, 175, 55, 0.08);
+            border: 1px solid rgba(212, 175, 55, 0.3);
         }
 
         /* Loading Screen */
@@ -135,7 +96,7 @@
             justify-content: center;
             align-items: center;
             z-index: 100;
-            transition: opacity 0.6s ease;
+            transition: opacity 0.5s ease;
         }
 
         .spinner {
@@ -154,71 +115,8 @@
         #loader p {
             margin-top: 15px;
             color: #d4af37;
-            font-family: 'Cinzel', serif;
-            letter-spacing: 2px;
             font-size: 13px;
-        }
-
-        /* --- Fullscreen Video Modal --- */
-        #videoModal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.95);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        #videoModal.active {
-            display: flex;
-            opacity: 1;
-        }
-
-        .video-box {
-            position: relative;
-            width: 85%;
-            max-width: 1100px;
-            background: #000;
-            border: 2px solid rgba(212, 175, 55, 0.7);
-            border-radius: 12px;
-            box-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
-            overflow: hidden;
-        }
-
-        .video-box video {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .close-video-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(3, 4, 6, 0.8);
-            border: 1px solid #d4af37;
-            color: #d4af37;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 10;
-            transition: 0.3s;
-        }
-
-        .close-video-btn:hover {
-            background: #d4af37;
-            color: #000;
+            letter-spacing: 2px;
         }
     </style>
 </head>
@@ -227,69 +125,35 @@
     <!-- Loading Screen -->
     <div id="loader">
         <div class="spinner"></div>
-        <p>Loading 3D Luxury Showroom...</p>
+        <p id="loader-text">Loading 3D Car...</p>
     </div>
 
     <!-- Header -->
     <header>
-        <div class="brand-logo">
-            <i class="fa-solid fa-crown" style="color: #d4af37; font-size: 20px;"></i>
-            <h1>BUGATTI</h1>
-        </div>
+        <div class="brand-title">LUXURY HYPERCAR</div>
     </header>
 
-    <!-- 3D Canvas -->
+    <!-- 3D Canvas Container -->
     <div id="webgl-container"></div>
 
-    <!-- Car Details Overlay -->
-    <div class="ui-overlay">
-        <h2 id="carTitle">BUGATTI <span>TOURBILLON</span></h2>
-        <p class="car-specs" id="carSpecs">1800 HP • V16 Hybrid • Top Speed 445 km/h</p>
-        <div class="click-hint">
-            <i class="fa-solid fa-play"></i> 3D Car par click karein cinematic video dekhne ke liye
-        </div>
-    </div>
+    <div class="hint-text">360° Rotate ke liye drag ya touch karein</div>
 
-    <!-- Fullscreen Video Modal -->
-    <div id="videoModal">
-        <div class="video-box">
-            <button class="close-video-btn" id="closeVideo">&times;</button>
-            <video id="carVideoPlayer" controls playsinline>
-                <source id="videoSource" src="" type="video/mp4">
-                Aapka browser video tag support nahi karta.
-            </video>
-        </div>
-    </div>
-
-    <!-- Main JavaScript Logic -->
     <script>
         // ==========================================
-        // 1. JSON / DATA-DRIVEN CAR DATABASE
+        // 1. CAR FILE CONFIGURATION
         // ==========================================
-        const carDatabase = {
-            id: "bugatti-tourbillon",
-            name: "BUGATTI TOURBILLON",
-            highlightName: "TOURBILLON",
-            specs: "1800 HP • 8.3L V16 Hybrid • 0-100 in 2.0s",
-            // 3D Model (.glb / .gltf) - Yahan aap apni Bugatti GLB file ka path de sakte hain
-            modelUrl: "https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/ferrari.glb",
-            // 20-Second Cinematic Video clip (.mp4)
-            videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-            scale: 0.9,
-            positionY: -0.1
-        };
-
-        // UI Information update
-        document.getElementById('carTitle').innerHTML = `BUGATTI <span>${carDatabase.highlightName}</span>`;
-        document.getElementById('carSpecs').innerText = carDatabase.specs;
+        // Agar aapki apni .glb / .gltf file hai toh yahan uska path/link daalein:
+        const CAR_MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/ferrari.glb';
+        const CAR_SCALE = 1.0;
+        const CAR_POS_Y = 0.0;
 
         // ==========================================
-        // 2. THREE.JS SCENE SETUP
+        // 2. THREE.JS SCENE, CAMERA & RENDERER
         // ==========================================
         const container = document.getElementById('webgl-container');
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x030406);
-        scene.fog = new THREE.FogExp2(0x030406, 0.04);
+        scene.fog = new THREE.FogExp2(0x030406, 0.035);
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
         camera.position.set(0, 1.6, 5.5);
@@ -299,19 +163,21 @@
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+        // Realistic studio lighting & metallic reflections ke liye tone-mapping
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.25;
+        renderer.toneMappingExposure = 1.2;
         container.appendChild(renderer.domElement);
 
         // ==========================================
-        // 3. SHOWROOM LIGHTING & ENVIRONMENT
+        // 3. SHOWROOM LIGHTING SETUP
         // ==========================================
         // Ambient Light
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
         scene.add(ambientLight);
 
-        // Main Ceiling Studio Light
-        const mainSpot = new THREE.SpotLight(0xfff3d6, 4.0);
+        // Ceiling Main Studio Spotlight
+        const mainSpot = new THREE.SpotLight(0xfff3d6, 4.5);
         mainSpot.position.set(0, 7, 0);
         mainSpot.angle = Math.PI / 3;
         mainSpot.penumbra = 0.8;
@@ -321,18 +187,18 @@
         mainSpot.shadow.bias = -0.0001;
         scene.add(mainSpot);
 
-        // Golden Rim Light (Front)
-        const frontKeyLight = new THREE.DirectionalLight(0xd4af37, 2.0);
-        frontKeyLight.position.set(4, 3, 5);
-        scene.add(frontKeyLight);
+        // Front Warm Golden Key Light
+        const frontKey = new THREE.DirectionalLight(0xd4af37, 2.2);
+        frontKey.position.set(4, 3, 5);
+        scene.add(frontKey);
 
-        // Cool Cyan Rim Light (Back reflection)
-        const backRimLight = new THREE.DirectionalLight(0x4a90e2, 1.8);
-        backRimLight.position.set(-5, 4, -4);
-        scene.add(backRimLight);
+        // Back Cool Rim Light (edges aur paint highlight karne ke liye)
+        const backRim = new THREE.DirectionalLight(0x4a90e2, 2.0);
+        backRim.position.set(-5, 4, -4);
+        scene.add(backRim);
 
         // ==========================================
-        // 4. SHOWROOM ROTATING PODIUM & FLOOR
+        // 4. REFLECTIVE SHOWROOM FLOOR & PODIUM
         // ==========================================
         const carStageGroup = new THREE.Group();
         scene.add(carStageGroup);
@@ -340,8 +206,8 @@
         // Reflective Dark Mirror Floor
         const floorGeo = new THREE.PlaneGeometry(30, 30);
         const floorMat = new THREE.MeshStandardMaterial({
-            color: 0x07080b,
-            metalness: 0.9,
+            color: 0x050608,
+            metalness: 0.88,
             roughness: 0.15
         });
         const floor = new THREE.Mesh(floorGeo, floorMat);
@@ -350,8 +216,8 @@
         floor.receiveShadow = true;
         scene.add(floor);
 
-        // Glowing Golden Podium Rings
-        const ringGeo = new THREE.TorusGeometry(2.6, 0.03, 16, 100);
+        // Golden Glowing Podium Ring
+        const ringGeo = new THREE.TorusGeometry(2.7, 0.03, 16, 100);
         const ringMat = new THREE.MeshBasicMaterial({ color: 0xd4af37 });
         const ringMesh = new THREE.Mesh(ringGeo, ringMat);
         ringMesh.rotation.x = Math.PI / 2;
@@ -359,35 +225,33 @@
         scene.add(ringMesh);
 
         // ==========================================
-        // 5. GLTF LOADER - REALISTIC 3D CAR
+        // 5. REALISTIC 3D CAR (GLTFLoader)
         // ==========================================
-        let loadedCarModel = null;
-        const carMeshesForRaycast = [];
-
-        const gltfLoader = new THREE.GLTFLoader();
+        const loader = new THREE.GLTFLoader();
         const dracoLoader = new THREE.DRACOLoader();
         dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/');
-        gltfLoader.setDRACOLoader(dracoLoader);
-        gltfLoader.load(
-            carDatabase.modelUrl,
+        loader.setDRACOLoader(dracoLoader);
+        loader.load(
+            CAR_MODEL_URL,
             (gltf) => {
-                loadedCarModel = gltf.scene;
-                loadedCarModel.scale.set(carDatabase.scale, carDatabase.scale, carDatabase.scale);
-                loadedCarModel.position.set(0, carDatabase.positionY, 0);
+                const carModel = gltf.scene;
+                carModel.scale.set(CAR_SCALE, CAR_SCALE, CAR_SCALE);
+                carModel.position.set(0, CAR_POS_Y, 0);
 
-                // Metallic shaders aur shadow enable karna
-                loadedCarModel.traverse((child) => {
+                // Car ke materials ko realistic metallic aur reflective banana
+                carModel.traverse((child) => {
                     if (child.isMesh) {
                         child.castShadow = true;
                         child.receiveShadow = true;
-                        carMeshesForRaycast.push(child);
 
-                        // Car paint ko realistic glossy aur reflective banana
                         if (child.material) {
                             child.material.envMapIntensity = 1.5;
-                            if (child.material.name.toLowerCase().includes('body') || child.material.name.toLowerCase().includes('paint')) {
+
+                            // Body paint ko glossy clearcoat look dena
+                            const matName = (child.material.name || '').toLowerCase();
+                            if (matName.includes('body') || matName.includes('paint') || matName.includes('red') || matName.includes('car')) {
                                 child.material.metalness = 0.85;
-                                child.material.roughness = 0.15;
+                                child.material.roughness = 0.18;
                                 child.material.clearcoat = 1.0;
                                 child.material.clearcoatRoughness = 0.05;
                             }
@@ -395,23 +259,22 @@
                     }
                 });
 
-                carStageGroup.add(loadedCarModel);
+                carStageGroup.add(carModel);
 
                 // Loader hide karein
                 const loaderEl = document.getElementById('loader');
                 loaderEl.style.opacity = '0';
-                setTimeout(() => loaderEl.style.display = 'none', 600);
+                setTimeout(() => loaderEl.style.display = 'none', 500);
             },
             (xhr) => {
-                // Loading progress
                 const percent = Math.round((xhr.loaded / xhr.total) * 100);
                 if (percent) {
-                    document.querySelector('#loader p').innerText = `Loading Bugatti 3D (${percent}%)...`;
+                    document.getElementById('loader-text').innerText = `Loading 3D Car (${percent}%)...`;
                 }
             },
-            (error) => {
-                console.error("GLTF Load Error:", error);
-                document.querySelector('#loader p').innerText = "Model loading error!";
+            (err) => {
+                console.error("Model load error:", err);
+                document.getElementById('loader-text').innerText = "Model load failed!";
             }
         );
 
@@ -421,33 +284,29 @@
         // ==========================================
         let isDragging = false;
         let previousPointerX = 0;
-        let dragDistance = 0; // Click aur Drag me farq karne ke liye
-        let rotationVelocity = 0.004; // Auto-rotation speed
+        const autoRotateSpeed = 0.0035; // Slow smooth auto-rotation
 
-        // Mouse Events
+        // Mouse Controls
         container.addEventListener('mousedown', (e) => {
             isDragging = true;
             previousPointerX = e.clientX;
-            dragDistance = 0;
         });
 
-        window.addEventListener('mouseup', (e) => {
+        window.addEventListener('mouseup', () => {
             isDragging = false;
         });
 
         window.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
             const deltaX = e.clientX - previousPointerX;
-            dragDistance += Math.abs(deltaX);
             carStageGroup.rotation.y += deltaX * 0.008;
             previousPointerX = e.clientX;
         });
 
-        // Touch Events for Mobile
+        // Touch Controls (Mobile)
         container.addEventListener('touchstart', (e) => {
             isDragging = true;
             previousPointerX = e.touches[0].clientX;
-            dragDistance = 0;
         }, { passive: true });
 
         window.addEventListener('touchend', () => {
@@ -457,84 +316,26 @@
         window.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
             const deltaX = e.touches[0].clientX - previousPointerX;
-            dragDistance += Math.abs(deltaX);
             carStageGroup.rotation.y += deltaX * 0.01;
             previousPointerX = e.touches[0].clientX;
         }, { passive: true });
 
         // ==========================================
-        // 7. CLICK TO PLAY 20s CINEMATIC VIDEO MODAL
-        // ==========================================
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-        const videoModal = document.getElementById('videoModal');
-        const videoPlayer = document.getElementById('carVideoPlayer');
-        const videoSource = document.getElementById('videoSource');
-        const closeVideoBtn = document.getElementById('closeVideo');
-
-        // 3D Car par Click detect karna
-        function onCarClick(event) {
-            // Agar user ne drag kiya hai toh video open na ho
-            if (dragDistance > 5) return;
-
-            const clientX = event.clientX || (event.changedTouches && event.changedTouches[0].clientX);
-            const clientY = event.clientY || (event.changedTouches && event.changedTouches[0].clientY);
-
-            mouse.x = (clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(clientY / window.innerHeight) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(carMeshesForRaycast, true);
-
-            if (intersects.length > 0) {
-                // Car click ho gayi! Video play karein
-                openCinematicVideo();
-            }
-        }
-
-        container.addEventListener('click', onCarClick);
-
-        function openCinematicVideo() {
-            videoSource.src = carDatabase.videoUrl;
-            videoPlayer.load();
-            videoModal.classList.add('active');
-            videoPlayer.currentTime = 0;
-            videoPlayer.play();
-        }
-
-        function closeCinematicVideo() {
-            videoPlayer.pause();
-            videoModal.classList.remove('active');
-        }
-
-        closeVideoBtn.addEventListener('click', closeCinematicVideo);
-
-        // Escape key se video band karein
-        window.addEventListener('keydown', (e) => {
-            if (e.key === "Escape") closeCinematicVideo();
-        });
-
-        // Modal ke background par click se band karein
-        videoModal.addEventListener('click', (e) => {
-            if (e.target === videoModal) closeCinematicVideo();
-        });
-
-        // ==========================================
-        // 8. ANIMATION LOOP & RESIZE
+        // 7. ANIMATION LOOP & RESIZE
         // ==========================================
         function animate() {
             requestAnimationFrame(animate);
 
-            // Agar user drag nahi kar raha aur video band hai, to smooth auto-rotate karein
-            if (!isDragging && !videoModal.classList.contains('active')) {
-                carStageGroup.rotation.y += rotationVelocity;
+            // Agar user drag nahi kar raha toh aahista aahista auto-rotate hota rahe
+            if (!isDragging) {
+                carStageGroup.rotation.y += autoRotateSpeed;
             }
 
             renderer.render(scene, camera);
         }
         animate();
 
-        // Responsive Resize
+        // Responsive Window Resize
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
