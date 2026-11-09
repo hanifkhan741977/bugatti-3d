@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUGATTI OFFICIAL - 3D Ultra Luxury Showroom</title>
+    
+    <!-- گوگل کا رئیل 3D انجن -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #030406;
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* --- ہیڈر (Header) --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 5%;
+            background: rgba(3, 4, 6, 0.88);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(15px);
+        }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .crown-badge {
+            font-size: 26px;
+            color: #d4af37;
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.8);
+        }
+
+        .logo-text h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #d4af37;
+            line-height: 1;
+        }
+
+        .logo-text span {
+            font-size: 9px;
+            letter-spacing: 2px;
+            color: #ccc;
+            text-transform: uppercase;
+        }
+
+        nav {
+            display: flex;
+            gap: 22px;
+        }
+
+        nav a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        nav a:hover, nav a.active {
+            color: #d4af37;
+            text-shadow: 0 0 12px rgba(212, 175, 55, 0.8);
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-bar {
+            position: relative;
+        }
+
+        .search-bar input {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            border-radius: 20px;
+            padding: 7px 15px 7px 35px;
+            color: #fff;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #d4af37;
+            font-size: 11px;
+        }
+
+        /* --- ہیرو سیکشن (Hero Section - تصویر والا ڈیزائن) --- */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            padding-top: 85px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* پیچھے رات کے وقت کا پینٹ ہاؤس اور چمکتا شہر */
+            background: 
+                radial-gradient(ellipse at bottom, rgba(212, 175, 55, 0.22) 0%, rgba(3, 4, 6, 0.9) 65%, #030406 100%),
+                url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 35%;
+            background: linear-gradient(180deg, transparent 0%, #030406 100%);
+            z-index: 2;
+        }
+
+        /* تصویر والی بائیں سائیڈ کی بڑی تحریر */
+        .hero-left-text {
+            position: absolute;
+            left: 5%;
+            top: 24%;
+            z-index: 10;
+            max-width: 440px;
+        }
+
+        .hero-left-text h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 46px;
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: 2px;
+            color: #ffffff;
+        }
+
+        .hero-left-text h2 .gold-shine {
+            background: linear-gradient(90deg, #fff3c4, #d4af37, #996515);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+        }
+
+        .hero-left-text p {
+            color: #aaa;
+            font-size: 14px;
+            margin: 15px 0 22px;
+            line-height: 1.6;
+        }
+
+        .gold-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(90deg, #ffe599, #d4af37, #aa820a);
+            color: #030406;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 12px 28px;
+            border-radius: 25px;
+            text-decoration: none;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+            transition: 0.3s;
+        }
+
+        .gold-btn:hover {
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.9);
+            transform: translateY(-2px);
+        }
+
+        /* --- ہیرو 3D اسٹیج (Hero Center Stage) --- */
+        .stage-center {
+            position: relative;
+            width: 100%;
+            height: 520px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+        }
+
+        /* فرش پر گولڈن نیون دائرے (Floor Neon Halo) */
+        .floor-halo {
+            position: absolute;
+            bottom: 30px;
+            width: 780px;
+            height: 240px;
+            border-radius: 50%;
+            border: 4px solid #d4af37;
+            box-shadow: 0 0 45px #d4af37, inset 0 0 40px #d4af37;
+            transform: rotateX(65deg);
+            z-index: 1;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, transparent 70%);
+        }
+
+        /* اوپر کا بڑا گولڈن فریم (Halo Floating Frame) */
+        .halo-frame {
+            position: absolute;
+            top: 25px;
+            width: 780px;
+            height: 170px;
+            border: 3px solid rgba(212, 175, 55, 0.7);
+            border-radius: 100px;
+            box-shadow: 0 0 35px rgba(212, 175, 55, 0.4), inset 0 0 20px rgba(212, 175, 55, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            pointer-events: none;
+            z-index: 6;
+        }
+
+        .halo-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid #d4af37;
+            background: rgba(3, 4, 6, 0.85);
+            color: #d4af37;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            pointer-events: auto;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+            transition: 0.3s;
+        }
+
+        .halo-btn:hover {
+            background: #d4af37;
+            color: #000;
+        }
+
+        .hero-car-box {
+            width: 620px;
+            height: 380px;
+            position: relative;
+            z-index: 4;
+        }
+
+        /* --- 3D ماڈل کی رئیل سیٹنگز (Real Metallic Shaders) --- */
+        model-viewer {
+            width: 100%;
+            height: 100%;
+            --poster-color: transparent;
+            outline: none;
+            /* اسٹوڈیو لائٹس اور میٹل کے خوبصورت ریفلیکشنز */
+            filter: drop-shadow(0 20px 15px rgba(0,0,0,0.95));
+        }
+
+        /* --- نیچے والے 4 پوڈیمز (کمپیوٹر پر 4 کالم اور موبائل پر 2 کالم) --- */
+        .podiums-section {
+            padding: 30px 5% 70px;
+            position: relative;
+            z-index: 10;
+            background: #030406;
+        }
+
+        .grid-podiums {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* کمپیوٹر پر 4 کالم */
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .podium-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* گولڈن اوول نیون رنگ (تصویر کے مطابق) */
+        .oval-gold-ring {
+            width: 100%;
+            height: 250px;
+            border: 3px solid #d4af37;
+            border-radius: 130px;
+            box-shadow: 
+                0 0 30px rgba(212, 175, 55, 0.6),
+                inset 0 0 25px rgba(212, 175, 55, 0.3);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(3,4,6,0.9) 75%);
+        }
+
+        /* اوپر چمکتا ہوا برانڈ کا لوگو */
+        .ring-brand-logo {
+            position: absolute;
+            top: 10px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #030406;
+            border: 2px solid #d4af37;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px #d4af37;
+            color: #d4af37;
+            font-size: 15px;
+            font-weight: 900;
+            font-family: 'Cinzel', serif;
+            z-index: 5;
+        }
+
+        .podium-card model-viewer {
+            height: 200px;
+        }
+
+        /* نیچے کی گولڈن سیڑھیاں (Stepped Base) */
+        .podium-base {
+            width: 85%;
+            height: 20px;
+            background: linear-gradient(90deg, #aa820a 0%, #d4af37 50%, #aa820a 100%);
+            border-radius: 50%;
+            margin-top: -10px;
+            box-shadow: 0 0 22px rgba(212, 175, 55, 0.75);
+            z-index: 2;
+        }
+
+        .podium-info {
+            text-align: center;
+            margin-top: 14px;
+        }
+
+        .podium-info h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .collection-btn {
+            display: inline-block;
+            background: linear-gradient(90deg, #ffe599, #d4af37, #aa820a);
+            color: #030406;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 8px 22px;
+            border-radius: 20px;
+            text-decoration: none;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+            transition: 0.3s;
+        }
+
+        .collection-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.8);
+        }
+
+        /* --- موبائل ریسپانسو سیٹنگز (Mobile Responsive) --- */
+        @media (max-width: 900px) {
+            nav, .search-bar {
+                display: none;
+            }
+            .hero-left-text {
+                position: relative;
+                left: auto;
+                top: auto;
+                text-align: center;
+                margin: 20px auto 0;
+            }
+            .hero-left-text h2 {
+                font-size: 32px;
+            }
+            .halo-frame, .floor-halo {
+                width: 95%;
+            }
+            .hero-car-box {
+                width: 100%;
+                height: 300px;
+            }
+            /* موبائل پر 2 کالمز لازمی */
+            .grid-podiums {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 15px;
+            }
+            .oval-gold-ring {
+                height: 190px;
+                border-radius: 95px;
+            }
+            .podium-card model-viewer {
+                height: 160px;
+            }
+            .podium-info h3 {
+                font-size: 14px;
+            }
+            .collection-btn {
+                font-size: 10px;
+                padding: 6px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ہیڈر (Header) -->
+    <header>
+        <div class="logo-wrap">
+            <i class="fa-solid fa-crown crown-badge"></i>
+            <div class="logo-text">
+                <h1>BUGATTI</h1>
+                <span>Atelier Molsheim</span>
+            </div>
+        </div>
+
+        <nav>
+            <a href="#" class="active">Home</a>
+            <a href="#">Hyper Sports</a>
+            <a href="#">Bespoke Models</a>
+            <a href="#">Showroom</a>
+            <a href="#">Heritage</a>
+        </nav>
+
+        <div class="actions">
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search Bugatti...">
+            </div>
+        </div>
+    </header>
+
+    <!-- ہیرو سیکشن (Hero 3D Showroom) -->
+    <section class="hero">
+        <!-- بائیں سائیڈ کی تحریر -->
+        <div class="hero-left-text">
+            <h2>
+                DREAM BIG
+                <span class="gold-shine">DRIVE LUXURY</span>
+            </h2>
+            <p>Explore the finest collection of Bugatti Hypercars & Ultimate Luxury.</p>
+            <a href="#showroom" class="gold-btn">Explore More <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+
+        <!-- درمیان کا بڑا 3D اسٹیج -->
+        <div class="stage-center">
+            <!-- تیرتا ہوا فریم -->
+            <div class="halo-frame">
+                <div class="halo-btn" onclick="rotateHero(-90)"><i class="fa-solid fa-chevron-left"></i></div>
+                <div class="halo-btn" onclick="rotateHero(90)"><i class="fa-solid fa-chevron-right"></i></div>
+            </div>
+
+            <!-- درمیان میں رئیل تھری ڈی کار (اصلی اسٹوڈیو ریفلیکشنز کے ساتھ) -->
+            <div class="hero-car-box">
+                <model-viewer 
+                    id="heroCar"
+                    src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/ferrari.glb"
+                    environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
+                    tone-mapping="aces"
+                    exposure="1.15"
+                    shadow-intensity="2"
+                    shadow-softness="0.5"
+                    auto-rotate
+                    rotation-per-second="20deg"
+                    auto-rotate-delay="1000"
+                    camera-controls
+                    touch-action="pan-y"
+                    camera-orbit="40deg 75deg 4.2m"
+                    interaction-prompt="none">
+                </model-viewer>
+            </div>
+
+            <!-- فرش پر چمکتے ہوئے سنہری دائرے -->
+            <div class="floor-halo"></div>
+        </div>
+    </section>
+
+    <!-- نیچے والے 4 کالمز (کمپیوٹر پر 4 کالم، موبائل پر 2 کالم) -->
+    <section class="podiums-section" id="showroom">
+        <div class="grid-podiums">
+
+            <!-- پوڈیم 1: Bugatti Tourbillon -->
+            <div class="podium-card">
+                <div class="oval-gold-ring">
+                    <div class="ring-brand-logo">EB</div>
+                    <model-viewer 
+                        src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/ferrari.glb"
+                        environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
+                        tone-mapping="aces"
+                        exposure="1.1"
+                        shadow-intensity="1.5"
+                        auto-rotate
+                        rotation-per-second="22deg"
+                        auto-rotate-delay="800"
+                        camera-controls
+                        touch-action="pan-y"
+                        camera-orbit="25deg 75deg 4.5m"
+                        interaction-prompt="none">
+                    </model-viewer>
+                </div>
+                <div class="podium-base"></div>
+                <div class="podium-info">
+                    <h3>Tourbillon</h3>
+                    <a href="#" class="collection-btn">View Collection &gt;</a>
+                </div>
+            </div>
+
+            <!-- پوڈیم 2: Bugatti Chiron Sport -->
+            <div class="podium-card">
+                <div class="oval-gold-ring">
+                    <div class="ring-brand-logo">EB</div>
+                    <model-viewer 
+                        src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/ferrari.glb"
+                        environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
+                        tone-mapping="aces"
+                        exposure="1.1"
+                        shadow-intensity="1.5"
+                        auto-rotate
+                        rotation-per-second="18deg"
+                        auto-rotate-delay="800"
+                        camera-controls
+                        touch-action="pan-y"
+                        camera-orbit="110deg 75deg 4.5m"
+                        interaction-prompt="none">
+                    </model-viewer>
+                </div>
+                <div class="podium-base"></div>
+                <div class="podium-info">
+                    <h3>Chiron Sport</h3>
+                    <a href="#" class="collection-btn">View Collection &gt;</a>
+                </div>
+            </div>
+
+            <!-- پوڈیم 3: Bugatti Bolide -->
+            <div class="podium-card">
+                <div class="oval-gold-ring">
+                    <div class="ring-brand-logo">EB</div>
+                    <model-viewer 
+                        src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/ferrari.glb"
+                        environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
+                        tone-mapping="aces"
+                        exposure="1.1"
+                        shadow-intensity="1.5"
+                        auto-rotate
+                        rotation-per-second="25deg"
+                        auto-rotate-delay="800"
+                        camera-controls
+                        touch-action="pan-y"
+                        camera-orbit="200deg 75deg 4.5m"
+                        interaction-prompt="none">
+                    </model-viewer>
+                </div>
+                <div class="podium-base"></div>
+                <div class="podium-info">
+                    <h3>Bugatti Bolide</h3>
+                    <a href="#" class="collection-btn">View Collection &gt;</a>
+                </div>
+            </div>
+
+            <!-- پوڈیم 4: Bugatti Divo -->
+            <div class="podium-card">
+                <div class="oval-gold-ring">
+                    <div class="ring-brand-logo">EB</div>
+                    <model-viewer 
+                        src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/ferrari.glb"
+                        environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
+                        tone-mapping="aces"
+                        exposure="1.1"
+                        shadow-intensity="1.5"
+                        auto-rotate
+                        rotation-per-second="20deg"
+                        auto-rotate-delay="800"
+                        camera-controls
+                        touch-action="pan-y"
+                        camera-orbit="290deg 75deg 4.5m"
+                        interaction-prompt="none">
+                    </model-viewer>
+                </div>
+                <div class="podium-base"></div>
+                <div class="podium-info">
+                    <h3>Bugatti Divo</h3>
+                    <a href="#" class="collection-btn">View Collection &gt;</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- بٹن سے گاڑی گھمانے کا فنکشن -->
+    <script>
+        const heroCar = document.getElementById('heroCar');
+        function rotateHero(degrees) {
+            const orbit = heroCar.getCameraOrbit();
+            orbit.theta += degrees * (Math.PI / 180);
+            heroCar.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius}m`;
+        }
+    </script>
+</body>
+</html>
