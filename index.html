@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BUGATTI OFFICIAL - 3D Ultra Luxury Showroom</title>
-    
-    <!-- گوگل کا رئیل 3D انجن -->
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Bugatti Luxury 3D Showroom</title>
+
+    <!-- Three.js aur GLTFLoader CDNs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/RGBELoader.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -15,603 +17,525 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
         }
 
         body {
             background-color: #030406;
             color: #ffffff;
             font-family: 'Montserrat', sans-serif;
-            overflow-x: hidden;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
         }
 
-        /* --- ہیڈر (Header) --- */
+        /* 3D Canvas Container */
+        #webgl-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            cursor: grab;
+        }
+
+        #webgl-container:active {
+            cursor: grabbing;
+        }
+
+        /* Luxury Header */
         header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 5%;
-            background: rgba(3, 4, 6, 0.88);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            backdrop-filter: blur(15px);
+            z-index: 10;
+            background: linear-gradient(180deg, rgba(3,4,6,0.85) 0%, transparent 100%);
+            pointer-events: none;
         }
 
-        .logo-wrap {
+        .brand-logo {
+            pointer-events: auto;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
-        .crown-badge {
-            font-size: 26px;
-            color: #d4af37;
-            text-shadow: 0 0 15px rgba(212, 175, 55, 0.8);
-        }
-
-        .logo-text h1 {
+        .brand-logo h1 {
             font-family: 'Cinzel', serif;
-            font-size: 22px;
-            font-weight: 900;
+            font-size: 24px;
+            color: #d4af37;
             letter-spacing: 4px;
-            color: #d4af37;
-            line-height: 1;
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
         }
 
-        .logo-text span {
-            font-size: 9px;
-            letter-spacing: 2px;
-            color: #ccc;
-            text-transform: uppercase;
-        }
-
-        nav {
-            display: flex;
-            gap: 22px;
-        }
-
-        nav a {
-            color: #e0e0e0;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-
-        nav a:hover, nav a.active {
-            color: #d4af37;
-            text-shadow: 0 0 12px rgba(212, 175, 55, 0.8);
-        }
-
-        .actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .search-bar {
-            position: relative;
-        }
-
-        .search-bar input {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            border-radius: 20px;
-            padding: 7px 15px 7px 35px;
-            color: #fff;
-            font-size: 12px;
-            outline: none;
-        }
-
-        .search-bar i {
+        /* UI Overlays & Instructions */
+        .ui-overlay {
             position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #d4af37;
-            font-size: 11px;
+            bottom: 30px;
+            left: 5%;
+            z-index: 10;
+            pointer-events: none;
         }
 
-        /* --- ہیرو سیکشن (Hero Section - تصویر والا ڈیزائن) --- */
-        .hero {
-            position: relative;
-            min-height: 100vh;
-            padding-top: 85px;
+        .ui-overlay h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 38px;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+
+        .ui-overlay h2 span {
+            color: #d4af37;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .car-specs {
+            color: #aaa;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .click-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            background: rgba(212, 175, 55, 0.1);
+            color: #d4af37;
+            font-size: 12px;
+            letter-spacing: 1px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
+        }
+
+        /* Loading Screen */
+        #loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #030406;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            /* پیچھے رات کے وقت کا پینٹ ہاؤس اور چمکتا شہر */
-            background: 
-                radial-gradient(ellipse at bottom, rgba(212, 175, 55, 0.22) 0%, rgba(3, 4, 6, 0.9) 65%, #030406 100%),
-                url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.6s ease;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(212, 175, 55, 0.2);
+            border-top-color: #d4af37;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        #loader p {
+            margin-top: 15px;
+            color: #d4af37;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 2px;
+            font-size: 13px;
+        }
+
+        /* --- Fullscreen Video Modal --- */
+        #videoModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        #videoModal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .video-box {
+            position: relative;
+            width: 85%;
+            max-width: 1100px;
+            background: #000;
+            border: 2px solid rgba(212, 175, 55, 0.7);
+            border-radius: 12px;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
             overflow: hidden;
         }
 
-        .hero::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
+        .video-box video {
             width: 100%;
-            height: 35%;
-            background: linear-gradient(180deg, transparent 0%, #030406 100%);
-            z-index: 2;
-        }
-
-        /* تصویر والی بائیں سائیڈ کی بڑی تحریر */
-        .hero-left-text {
-            position: absolute;
-            left: 5%;
-            top: 24%;
-            z-index: 10;
-            max-width: 440px;
-        }
-
-        .hero-left-text h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 46px;
-            font-weight: 900;
-            line-height: 1.1;
-            letter-spacing: 2px;
-            color: #ffffff;
-        }
-
-        .hero-left-text h2 .gold-shine {
-            background: linear-gradient(90deg, #fff3c4, #d4af37, #996515);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            height: auto;
             display: block;
         }
 
-        .hero-left-text p {
-            color: #aaa;
-            font-size: 14px;
-            margin: 15px 0 22px;
-            line-height: 1.6;
-        }
-
-        .gold-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: linear-gradient(90deg, #ffe599, #d4af37, #aa820a);
-            color: #030406;
-            font-weight: 700;
-            font-size: 13px;
-            padding: 12px 28px;
-            border-radius: 25px;
-            text-decoration: none;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
-            transition: 0.3s;
-        }
-
-        .gold-btn:hover {
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.9);
-            transform: translateY(-2px);
-        }
-
-        /* --- ہیرو 3D اسٹیج (Hero Center Stage) --- */
-        .stage-center {
-            position: relative;
-            width: 100%;
-            height: 520px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 5;
-        }
-
-        /* فرش پر گولڈن نیون دائرے (Floor Neon Halo) */
-        .floor-halo {
+        .close-video-btn {
             position: absolute;
-            bottom: 30px;
-            width: 780px;
-            height: 240px;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            border: 4px solid #d4af37;
-            box-shadow: 0 0 45px #d4af37, inset 0 0 40px #d4af37;
-            transform: rotateX(65deg);
-            z-index: 1;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, transparent 70%);
-        }
-
-        /* اوپر کا بڑا گولڈن فریم (Halo Floating Frame) */
-        .halo-frame {
-            position: absolute;
-            top: 25px;
-            width: 780px;
-            height: 170px;
-            border: 3px solid rgba(212, 175, 55, 0.7);
-            border-radius: 100px;
-            box-shadow: 0 0 35px rgba(212, 175, 55, 0.4), inset 0 0 20px rgba(212, 175, 55, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            pointer-events: none;
-            z-index: 6;
-        }
-
-        .halo-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: 2px solid #d4af37;
-            background: rgba(3, 4, 6, 0.85);
+            background: rgba(3, 4, 6, 0.8);
+            border: 1px solid #d4af37;
             color: #d4af37;
+            font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
             cursor: pointer;
-            pointer-events: auto;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+            z-index: 10;
             transition: 0.3s;
         }
 
-        .halo-btn:hover {
+        .close-video-btn:hover {
             background: #d4af37;
             color: #000;
-        }
-
-        .hero-car-box {
-            width: 620px;
-            height: 380px;
-            position: relative;
-            z-index: 4;
-        }
-
-        /* --- 3D ماڈل کی رئیل سیٹنگز (Real Metallic Shaders) --- */
-        model-viewer {
-            width: 100%;
-            height: 100%;
-            --poster-color: transparent;
-            outline: none;
-            /* اسٹوڈیو لائٹس اور میٹل کے خوبصورت ریفلیکشنز */
-            filter: drop-shadow(0 20px 15px rgba(0,0,0,0.95));
-        }
-
-        /* --- نیچے والے 4 پوڈیمز (کمپیوٹر پر 4 کالم اور موبائل پر 2 کالم) --- */
-        .podiums-section {
-            padding: 30px 5% 70px;
-            position: relative;
-            z-index: 10;
-            background: #030406;
-        }
-
-        .grid-podiums {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr); /* کمپیوٹر پر 4 کالم */
-            gap: 25px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .podium-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        /* گولڈن اوول نیون رنگ (تصویر کے مطابق) */
-        .oval-gold-ring {
-            width: 100%;
-            height: 250px;
-            border: 3px solid #d4af37;
-            border-radius: 130px;
-            box-shadow: 
-                0 0 30px rgba(212, 175, 55, 0.6),
-                inset 0 0 25px rgba(212, 175, 55, 0.3);
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(3,4,6,0.9) 75%);
-        }
-
-        /* اوپر چمکتا ہوا برانڈ کا لوگو */
-        .ring-brand-logo {
-            position: absolute;
-            top: 10px;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #030406;
-            border: 2px solid #d4af37;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 15px #d4af37;
-            color: #d4af37;
-            font-size: 15px;
-            font-weight: 900;
-            font-family: 'Cinzel', serif;
-            z-index: 5;
-        }
-
-        .podium-card model-viewer {
-            height: 200px;
-        }
-
-        /* نیچے کی گولڈن سیڑھیاں (Stepped Base) */
-        .podium-base {
-            width: 85%;
-            height: 20px;
-            background: linear-gradient(90deg, #aa820a 0%, #d4af37 50%, #aa820a 100%);
-            border-radius: 50%;
-            margin-top: -10px;
-            box-shadow: 0 0 22px rgba(212, 175, 55, 0.75);
-            z-index: 2;
-        }
-
-        .podium-info {
-            text-align: center;
-            margin-top: 14px;
-        }
-
-        .podium-info h3 {
-            font-family: 'Cinzel', serif;
-            font-size: 18px;
-            color: #fff;
-            margin-bottom: 6px;
-        }
-
-        .collection-btn {
-            display: inline-block;
-            background: linear-gradient(90deg, #ffe599, #d4af37, #aa820a);
-            color: #030406;
-            font-size: 12px;
-            font-weight: 700;
-            padding: 8px 22px;
-            border-radius: 20px;
-            text-decoration: none;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
-            transition: 0.3s;
-        }
-
-        .collection-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.8);
-        }
-
-        /* --- موبائل ریسپانسو سیٹنگز (Mobile Responsive) --- */
-        @media (max-width: 900px) {
-            nav, .search-bar {
-                display: none;
-            }
-            .hero-left-text {
-                position: relative;
-                left: auto;
-                top: auto;
-                text-align: center;
-                margin: 20px auto 0;
-            }
-            .hero-left-text h2 {
-                font-size: 32px;
-            }
-            .halo-frame, .floor-halo {
-                width: 95%;
-            }
-            .hero-car-box {
-                width: 100%;
-                height: 300px;
-            }
-            /* موبائل پر 2 کالمز لازمی */
-            .grid-podiums {
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 15px;
-            }
-            .oval-gold-ring {
-                height: 190px;
-                border-radius: 95px;
-            }
-            .podium-card model-viewer {
-                height: 160px;
-            }
-            .podium-info h3 {
-                font-size: 14px;
-            }
-            .collection-btn {
-                font-size: 10px;
-                padding: 6px 14px;
-            }
         }
     </style>
 </head>
 <body>
 
-    <!-- ہیڈر (Header) -->
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <p>Loading 3D Luxury Showroom...</p>
+    </div>
+
+    <!-- Header -->
     <header>
-        <div class="logo-wrap">
-            <i class="fa-solid fa-crown crown-badge"></i>
-            <div class="logo-text">
-                <h1>BUGATTI</h1>
-                <span>Atelier Molsheim</span>
-            </div>
-        </div>
-
-        <nav>
-            <a href="#" class="active">Home</a>
-            <a href="#">Hyper Sports</a>
-            <a href="#">Bespoke Models</a>
-            <a href="#">Showroom</a>
-            <a href="#">Heritage</a>
-        </nav>
-
-        <div class="actions">
-            <div class="search-bar">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" placeholder="Search Bugatti...">
-            </div>
+        <div class="brand-logo">
+            <i class="fa-solid fa-crown" style="color: #d4af37; font-size: 20px;"></i>
+            <h1>BUGATTI</h1>
         </div>
     </header>
 
-    <!-- ہیرو سیکشن (Hero 3D Showroom) -->
-    <section class="hero">
-        <!-- بائیں سائیڈ کی تحریر -->
-        <div class="hero-left-text">
-            <h2>
-                DREAM BIG
-                <span class="gold-shine">DRIVE LUXURY</span>
-            </h2>
-            <p>Explore the finest collection of Bugatti Hypercars & Ultimate Luxury.</p>
-            <a href="#showroom" class="gold-btn">Explore More <i class="fa-solid fa-chevron-right"></i></a>
+    <!-- 3D Canvas -->
+    <div id="webgl-container"></div>
+
+    <!-- Car Details Overlay -->
+    <div class="ui-overlay">
+        <h2 id="carTitle">BUGATTI <span>TOURBILLON</span></h2>
+        <p class="car-specs" id="carSpecs">1800 HP • V16 Hybrid • Top Speed 445 km/h</p>
+        <div class="click-hint">
+            <i class="fa-solid fa-play"></i> 3D Car par click karein cinematic video dekhne ke liye
         </div>
+    </div>
 
-        <!-- درمیان کا بڑا 3D اسٹیج -->
-        <div class="stage-center">
-            <!-- تیرتا ہوا فریم -->
-            <div class="halo-frame">
-                <div class="halo-btn" onclick="rotateHero(-90)"><i class="fa-solid fa-chevron-left"></i></div>
-                <div class="halo-btn" onclick="rotateHero(90)"><i class="fa-solid fa-chevron-right"></i></div>
-            </div>
-
-            <!-- درمیان میں رئیل تھری ڈی کار (اصلی اسٹوڈیو ریفلیکشنز کے ساتھ) -->
-            <div class="hero-car-box">
-                <model-viewer 
-                    id="heroCar"
-                    src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/ferrari.glb"
-                    environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
-                    tone-mapping="aces"
-                    exposure="1.15"
-                    shadow-intensity="2"
-                    shadow-softness="0.5"
-                    auto-rotate
-                    rotation-per-second="20deg"
-                    auto-rotate-delay="1000"
-                    camera-controls
-                    touch-action="pan-y"
-                    camera-orbit="40deg 75deg 4.2m"
-                    interaction-prompt="none">
-                </model-viewer>
-            </div>
-
-            <!-- فرش پر چمکتے ہوئے سنہری دائرے -->
-            <div class="floor-halo"></div>
+    <!-- Fullscreen Video Modal -->
+    <div id="videoModal">
+        <div class="video-box">
+            <button class="close-video-btn" id="closeVideo">&times;</button>
+            <video id="carVideoPlayer" controls playsinline>
+                <source id="videoSource" src="" type="video/mp4">
+                Aapka browser video tag support nahi karta.
+            </video>
         </div>
-    </section>
+    </div>
 
-    <!-- نیچے والے 4 کالمز (کمپیوٹر پر 4 کالم، موبائل پر 2 کالم) -->
-    <section class="podiums-section" id="showroom">
-        <div class="grid-podiums">
-
-            <!-- پوڈیم 1: Bugatti Tourbillon -->
-            <div class="podium-card">
-                <div class="oval-gold-ring">
-                    <div class="ring-brand-logo">EB</div>
-                    <model-viewer 
-                        src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/ferrari.glb"
-                        environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
-                        tone-mapping="aces"
-                        exposure="1.1"
-                        shadow-intensity="1.5"
-                        auto-rotate
-                        rotation-per-second="22deg"
-                        auto-rotate-delay="800"
-                        camera-controls
-                        touch-action="pan-y"
-                        camera-orbit="25deg 75deg 4.5m"
-                        interaction-prompt="none">
-                    </model-viewer>
-                </div>
-                <div class="podium-base"></div>
-                <div class="podium-info">
-                    <h3>Tourbillon</h3>
-                    <a href="#" class="collection-btn">View Collection &gt;</a>
-                </div>
-            </div>
-
-            <!-- پوڈیم 2: Bugatti Chiron Sport -->
-            <div class="podium-card">
-                <div class="oval-gold-ring">
-                    <div class="ring-brand-logo">EB</div>
-                    <model-viewer 
-                        src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/ferrari.glb"
-                        environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
-                        tone-mapping="aces"
-                        exposure="1.1"
-                        shadow-intensity="1.5"
-                        auto-rotate
-                        rotation-per-second="18deg"
-                        auto-rotate-delay="800"
-                        camera-controls
-                        touch-action="pan-y"
-                        camera-orbit="110deg 75deg 4.5m"
-                        interaction-prompt="none">
-                    </model-viewer>
-                </div>
-                <div class="podium-base"></div>
-                <div class="podium-info">
-                    <h3>Chiron Sport</h3>
-                    <a href="#" class="collection-btn">View Collection &gt;</a>
-                </div>
-            </div>
-
-            <!-- پوڈیم 3: Bugatti Bolide -->
-            <div class="podium-card">
-                <div class="oval-gold-ring">
-                    <div class="ring-brand-logo">EB</div>
-                    <model-viewer 
-                        src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/ferrari.glb"
-                        environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
-                        tone-mapping="aces"
-                        exposure="1.1"
-                        shadow-intensity="1.5"
-                        auto-rotate
-                        rotation-per-second="25deg"
-                        auto-rotate-delay="800"
-                        camera-controls
-                        touch-action="pan-y"
-                        camera-orbit="200deg 75deg 4.5m"
-                        interaction-prompt="none">
-                    </model-viewer>
-                </div>
-                <div class="podium-base"></div>
-                <div class="podium-info">
-                    <h3>Bugatti Bolide</h3>
-                    <a href="#" class="collection-btn">View Collection &gt;</a>
-                </div>
-            </div>
-
-            <!-- پوڈیم 4: Bugatti Divo -->
-            <div class="podium-card">
-                <div class="oval-gold-ring">
-                    <div class="ring-brand-logo">EB</div>
-                    <model-viewer 
-                        src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/ferrari.glb"
-                        environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
-                        tone-mapping="aces"
-                        exposure="1.1"
-                        shadow-intensity="1.5"
-                        auto-rotate
-                        rotation-per-second="20deg"
-                        auto-rotate-delay="800"
-                        camera-controls
-                        touch-action="pan-y"
-                        camera-orbit="290deg 75deg 4.5m"
-                        interaction-prompt="none">
-                    </model-viewer>
-                </div>
-                <div class="podium-base"></div>
-                <div class="podium-info">
-                    <h3>Bugatti Divo</h3>
-                    <a href="#" class="collection-btn">View Collection &gt;</a>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- بٹن سے گاڑی گھمانے کا فنکشن -->
+    <!-- Main JavaScript Logic -->
     <script>
-        const heroCar = document.getElementById('heroCar');
-        function rotateHero(degrees) {
-            const orbit = heroCar.getCameraOrbit();
-            orbit.theta += degrees * (Math.PI / 180);
-            heroCar.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius}m`;
+        // ==========================================
+        // 1. JSON / DATA-DRIVEN CAR DATABASE
+        // ==========================================
+        const carDatabase = {
+            id: "bugatti-tourbillon",
+            name: "BUGATTI TOURBILLON",
+            highlightName: "TOURBILLON",
+            specs: "1800 HP • 8.3L V16 Hybrid • 0-100 in 2.0s",
+            // 3D Model (.glb / .gltf) - Yahan aap apni Bugatti GLB file ka path de sakte hain
+            modelUrl: "https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/ferrari.glb",
+            // 20-Second Cinematic Video clip (.mp4)
+            videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+            scale: 0.9,
+            positionY: -0.1
+        };
+
+        // UI Information update
+        document.getElementById('carTitle').innerHTML = `BUGATTI <span>${carDatabase.highlightName}</span>`;
+        document.getElementById('carSpecs').innerText = carDatabase.specs;
+
+        // ==========================================
+        // 2. THREE.JS SCENE SETUP
+        // ==========================================
+        const container = document.getElementById('webgl-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x030406);
+        scene.fog = new THREE.FogExp2(0x030406, 0.04);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 1.6, 5.5);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.25;
+        container.appendChild(renderer.domElement);
+
+        // ==========================================
+        // 3. SHOWROOM LIGHTING & ENVIRONMENT
+        // ==========================================
+        // Ambient Light
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambientLight);
+
+        // Main Ceiling Studio Light
+        const mainSpot = new THREE.SpotLight(0xfff3d6, 4.0);
+        mainSpot.position.set(0, 7, 0);
+        mainSpot.angle = Math.PI / 3;
+        mainSpot.penumbra = 0.8;
+        mainSpot.castShadow = true;
+        mainSpot.shadow.mapSize.width = 2048;
+        mainSpot.shadow.mapSize.height = 2048;
+        mainSpot.shadow.bias = -0.0001;
+        scene.add(mainSpot);
+
+        // Golden Rim Light (Front)
+        const frontKeyLight = new THREE.DirectionalLight(0xd4af37, 2.0);
+        frontKeyLight.position.set(4, 3, 5);
+        scene.add(frontKeyLight);
+
+        // Cool Cyan Rim Light (Back reflection)
+        const backRimLight = new THREE.DirectionalLight(0x4a90e2, 1.8);
+        backRimLight.position.set(-5, 4, -4);
+        scene.add(backRimLight);
+
+        // ==========================================
+        // 4. SHOWROOM ROTATING PODIUM & FLOOR
+        // ==========================================
+        const carStageGroup = new THREE.Group();
+        scene.add(carStageGroup);
+
+        // Reflective Dark Mirror Floor
+        const floorGeo = new THREE.PlaneGeometry(30, 30);
+        const floorMat = new THREE.MeshStandardMaterial({
+            color: 0x07080b,
+            metalness: 0.9,
+            roughness: 0.15
+        });
+        const floor = new THREE.Mesh(floorGeo, floorMat);
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.y = -0.01;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        // Glowing Golden Podium Rings
+        const ringGeo = new THREE.TorusGeometry(2.6, 0.03, 16, 100);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0xd4af37 });
+        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+        ringMesh.rotation.x = Math.PI / 2;
+        ringMesh.position.y = 0.01;
+        scene.add(ringMesh);
+
+        // ==========================================
+        // 5. GLTF LOADER - REALISTIC 3D CAR
+        // ==========================================
+        let loadedCarModel = null;
+        const carMeshesForRaycast = [];
+
+        const gltfLoader = new THREE.GLTFLoader();
+        gltfLoader.load(
+            carDatabase.modelUrl,
+            (gltf) => {
+                loadedCarModel = gltf.scene;
+                loadedCarModel.scale.set(carDatabase.scale, carDatabase.scale, carDatabase.scale);
+                loadedCarModel.position.set(0, carDatabase.positionY, 0);
+
+                // Metallic shaders aur shadow enable karna
+                loadedCarModel.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                        carMeshesForRaycast.push(child);
+
+                        // Car paint ko realistic glossy aur reflective banana
+                        if (child.material) {
+                            child.material.envMapIntensity = 1.5;
+                            if (child.material.name.toLowerCase().includes('body') || child.material.name.toLowerCase().includes('paint')) {
+                                child.material.metalness = 0.85;
+                                child.material.roughness = 0.15;
+                                child.material.clearcoat = 1.0;
+                                child.material.clearcoatRoughness = 0.05;
+                            }
+                        }
+                    }
+                });
+
+                carStageGroup.add(loadedCarModel);
+
+                // Loader hide karein
+                const loaderEl = document.getElementById('loader');
+                loaderEl.style.opacity = '0';
+                setTimeout(() => loaderEl.style.display = 'none', 600);
+            },
+            (xhr) => {
+                // Loading progress
+                const percent = Math.round((xhr.loaded / xhr.total) * 100);
+                if (percent) {
+                    document.querySelector('#loader p').innerText = `Loading Bugatti 3D (${percent}%)...`;
+                }
+            },
+            (error) => {
+                console.error("GLTF Load Error:", error);
+                document.querySelector('#loader p').innerText = "Model loading error!";
+            }
+        );
+
+        // ==========================================
+        // 6. AUTO-ROTATION, MOUSE DRAG & TOUCH CONTROLS
+        // (Yeh logic bilkul intact aur smooth rakhi gayi hai)
+        // ==========================================
+        let isDragging = false;
+        let previousPointerX = 0;
+        let dragDistance = 0; // Click aur Drag me farq karne ke liye
+        let rotationVelocity = 0.004; // Auto-rotation speed
+
+        // Mouse Events
+        container.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            previousPointerX = e.clientX;
+            dragDistance = 0;
+        });
+
+        window.addEventListener('mouseup', (e) => {
+            isDragging = false;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const deltaX = e.clientX - previousPointerX;
+            dragDistance += Math.abs(deltaX);
+            carStageGroup.rotation.y += deltaX * 0.008;
+            previousPointerX = e.clientX;
+        });
+
+        // Touch Events for Mobile
+        container.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            previousPointerX = e.touches[0].clientX;
+            dragDistance = 0;
+        }, { passive: true });
+
+        window.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const deltaX = e.touches[0].clientX - previousPointerX;
+            dragDistance += Math.abs(deltaX);
+            carStageGroup.rotation.y += deltaX * 0.01;
+            previousPointerX = e.touches[0].clientX;
+        }, { passive: true });
+
+        // ==========================================
+        // 7. CLICK TO PLAY 20s CINEMATIC VIDEO MODAL
+        // ==========================================
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const videoModal = document.getElementById('videoModal');
+        const videoPlayer = document.getElementById('carVideoPlayer');
+        const videoSource = document.getElementById('videoSource');
+        const closeVideoBtn = document.getElementById('closeVideo');
+
+        // 3D Car par Click detect karna
+        function onCarClick(event) {
+            // Agar user ne drag kiya hai toh video open na ho
+            if (dragDistance > 5) return;
+
+            const clientX = event.clientX || (event.changedTouches && event.changedTouches[0].clientX);
+            const clientY = event.clientY || (event.changedTouches && event.changedTouches[0].clientY);
+
+            mouse.x = (clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(carMeshesForRaycast, true);
+
+            if (intersects.length > 0) {
+                // Car click ho gayi! Video play karein
+                openCinematicVideo();
+            }
         }
+
+        container.addEventListener('click', onCarClick);
+
+        function openCinematicVideo() {
+            videoSource.src = carDatabase.videoUrl;
+            videoPlayer.load();
+            videoModal.classList.add('active');
+            videoPlayer.currentTime = 0;
+            videoPlayer.play();
+        }
+
+        function closeCinematicVideo() {
+            videoPlayer.pause();
+            videoModal.classList.remove('active');
+        }
+
+        closeVideoBtn.addEventListener('click', closeCinematicVideo);
+
+        // Escape key se video band karein
+        window.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") closeCinematicVideo();
+        });
+
+        // Modal ke background par click se band karein
+        videoModal.addEventListener('click', (e) => {
+            if (e.target === videoModal) closeCinematicVideo();
+        });
+
+        // ==========================================
+        // 8. ANIMATION LOOP & RESIZE
+        // ==========================================
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Agar user drag nahi kar raha aur video band hai, to smooth auto-rotate karein
+            if (!isDragging && !videoModal.classList.contains('active')) {
+                carStageGroup.rotation.y += rotationVelocity;
+            }
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Responsive Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
